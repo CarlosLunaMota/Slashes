@@ -1,22 +1,41 @@
 # The /// Interpreter
 
-This is a simple python interpreter for the /// programming language
-written by Carlos Luna Mota <https://github.com/CarlosLunaMota>.
+This is a simple Python interpreter for the /// programming language
+written by Carlos Luna Mota (https://github.com/CarlosLunaMota/Slashes).
+
+
+## Input
 
 The interpreter function `slashes(string, verbose=0)` requires an input
-string (named `string`) with the code to execute and an optional integer
-(named `verbose`) that controls the amount of debug information printed:
+string (`string`) with the executable code and accepts an optional integer
+parameter (`verbose`) that controls the verbosity of the interpreter:
 
-* By default, `verbose = 0` and no debug information is printed.
-* For any `verbose != 0` detailed debug information is printed.
-* For any `verbose >  1` the interpreter performs a step-by-step execution.
+* If `verbose == 0` no debug information is printed.
+* If `verbose >= 1` prints the initial input and the final output.
+* If `verbose >= 2` prints the main substitution steps.
+* If `verbose >= 3` prints all the substitution steps.
+* If `verbose >= 4` stops at the main substitution steps.
+* If `verbose >= 5` stops at every substitution step.
+
+Since Python uses `\` as escape character, you might need to either use raw
+strings or duplicate all the backslashes of the input string (e.g. these
+two codes are equivalent):
+
+    program_1 = r"/foo/Hello, world!//B\/\\R/foo/B/\R"
+    program_2 = "/foo/Hello, world!//B\\/\\\\R/foo/B/\\R"
+
+
+## Output
 
 The interpreter returns a generator function that yields the output one
 character at a time. You can use:
 
     output = "".join(slashes(code_to_execute))
 
-to obtain the whole output at once.
+to obtain the whole output as a single string.
+
+
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
 
 
 # The /// esoteric programming language
@@ -24,9 +43,12 @@ to obtain the whole output at once.
 /// (pronounced "slashes") is a minimalist Turing-complete esoteric
 programming language, invented by Tanner Swett in 2006.
 
-You can find more information about /// at https://esolangs.org/wiki////
+You can find more information about /// at: <https://esolangs.org/wiki////>
+
 
 ## Language Especification
+
+> *Language especification taken from: <https://esolangs.org/wiki////>*
 
 If the program is empty, execution halts. Otherwise, the first character is
 taken, and execution proceeds as follows:
@@ -37,7 +59,8 @@ taken, and execution proceeds as follows:
   identified and a substitution is performed.
 * Otherwise, the character is printed and removed.
 
-The execution process then starts over again with the modified program. 
+The execution process then starts over again with the modified program.
+
 
 ### Pattern
 
@@ -53,6 +76,7 @@ pattern, as follows:
 If this process reaches the end of the program without reaching a
 terminating `/`, then the program halts.
 
+
 ### Replacement
 
 Otherwise, the same process is repeated again, making up the replacement.
@@ -64,6 +88,7 @@ Otherwise, the same process is repeated again, making up the replacement.
 * Otherwise, the character is added to the replacement and removed.
 
 Again, if no terminating `/` is reached, the program halts.
+
 
 ### Substitution
 
@@ -99,31 +124,35 @@ the pattern, e.g. `/ab/bbaa/abb`:
     ...
 
 
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
+
+
 # LICENSE
 
-This file was created by Carlos Luna Mota and is under the Unlicense:
+This file was created by Carlos Luna Mota and is released into de public
+domain using the following license:
 
-    This is free and unencumbered software released into the public domain.
-
-    Anyone is free to copy, modify, publish, use, compile, sell, or
-    distribute this software, either in source code form or as a compiled
-    binary, for any purpose, commercial or non-commercial, and by any
-    means.
-
-    In jurisdictions that recognize copyright laws, the author or authors
-    of this software dedicate any and all copyright interest in the
-    software to the public domain. We make this dedication for the benefit
-    of the public at large and to the detriment of our heirs and
-    successors. We intend this dedication to be an overt act of
-    relinquishment in perpetuity of all present and future rights to this
-    software under copyright law.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    OTHER DEALINGS IN THE SOFTWARE.
-
-    For more information, please refer to <http://unlicense.org>
+> This is free and unencumbered software released into the public domain.
+>
+> Anyone is free to copy, modify, publish, use, compile, sell, or
+> distribute this software, either in source code form or as a compiled
+> binary, for any purpose, commercial or non-commercial, and by any
+> means.
+> 
+> In jurisdictions that recognize copyright laws, the author or authors
+> of this software dedicate any and all copyright interest in the
+> software to the public domain. We make this dedication for the benefit
+> of the public at large and to the detriment of our heirs and
+> successors. We intend this dedication to be an overt act of
+> relinquishment in perpetuity of all present and future rights to this
+> software under copyright law.
+> 
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+> EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+> MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+> IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+> OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+> ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+> OTHER DEALINGS IN THE SOFTWARE.
+> 
+> For more information, please refer to <http://unlicense.org>
