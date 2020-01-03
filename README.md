@@ -6,16 +6,21 @@ written by Carlos Luna Mota (https://github.com/CarlosLunaMota/Slashes).
 
 ## Input
 
-The interpreter function `slashes(string, verbose=0)` requires an input
-string (`string`) with the executable code and accepts an optional integer
-parameter (`verbose`) that controls the verbosity of the interpreter:
+The interpreter function `slashes(string, verbose=0, color=0)` requires an
+input string (`string`) with the executable code and accepts two optional
+integer parameters (`verbose` and `color`) that control the interpreter's
+output:
 
-* If `verbose == 0` no debug information is printed.
+* If `verbose <= 0` no debug information is printed (default).
 * If `verbose >= 1` prints the initial input and the final output.
 * If `verbose >= 2` prints the main substitution steps.
 * If `verbose >= 3` prints all the substitution steps.
 * If `verbose >= 4` stops at the main substitution steps.
 * If `verbose >= 5` stops at every substitution step.
+
+* If `color <= 0` no color highlighting is applied to the output (default).
+* If `color == 1` subtle grayscale highlighting is applied to the output.
+* If `color >= 2` bright color highlighting is applied to the output.
 
 Since Python uses `\` as escape character, you might need to either use raw
 strings or duplicate all the backslashes of the input string (e.g. these
@@ -35,8 +40,7 @@ character at a time. You can use:
 to obtain the whole output as a single string.
 
 
- ---------------------------------------------------------------------------
- 
+---------------------------------------------------------------------------
 
 
 # The /// esoteric programming language
@@ -125,7 +129,7 @@ the pattern, e.g. `/ab/bbaa/abb`:
     ...
 
 
- ---------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 
 # LICENSE
