@@ -17,16 +17,21 @@ except NameError: pass              #
 #
 #   ## Input
 #
-#   The interpreter function `slashes(string, verbose=0)` requires an input
-#   string (`string`) with the executable code and accepts an optional integer
-#   parameter (`verbose`) that controls the verbosity of the interpreter:
+#   The interpreter function `slashes(string, verbose=0, color=0)` requires an
+#   input string (`string`) with the executable code and accepts two optional
+#   integer parameters (`verbose` and `color`) that control the interpreter's
+#   output:
 #
-#   * If `verbose == 0` no debug information is printed.
+#   * If `verbose <= 0` no debug information is printed (default).
 #   * If `verbose >= 1` prints the initial input and the final output.
 #   * If `verbose >= 2` prints the main substitution steps.
 #   * If `verbose >= 3` prints all the substitution steps.
 #   * If `verbose >= 4` stops at the main substitution steps.
 #   * If `verbose >= 5` stops at every substitution step.
+#
+#   * If `color <= 0` no color highlighting is applied to the output (default).
+#   * If `color == 1` subtle grayscale highlighting is applied to the output.
+#   * If `color >= 2` bright color highlighting is applied to the output.
 #
 #   Since Python uses `\` as escape character, you might need to either use raw
 #   strings or duplicate all the backslashes of the input string (e.g. these
@@ -173,12 +178,17 @@ except NameError: pass              #
 
 
 ### /// INTERPRETER ############################################################
-            
-def slashes(string, verbose=0):
 
-    # Print Debug Info #############################################
-    if verbose > 0: output = []; print("INPUT:  " + string + "\n") #
-    ################################################################
+def slashes(string, verbose=0, color=0):
+
+    # Print Debug Info and Set Color Scheme #########################
+    if verbose >  0: output = []; print("INPUT:  " + string + "\n") #
+    if   color <= 0: X = ["/", "/", "/", "\n"]                      #
+    elif color == 1: X = ["\033[0;1m/\033[0;2m"]*3 + ["\033[0m\n"]  #
+    elif color >= 2: X = ["\033[0;2;90m/\033[0;91m",                #
+                          "\033[0;2;90m/\033[0;92m",                #
+                          "\033[0;2;90m/\033[0;96m", "\033[0m\n"]   #        
+    #################################################################
 
     while string:
 
@@ -221,30 +231,45 @@ def slashes(string, verbose=0):
         rep    = "".join(replacement)
         string = string[i+1:]
 
-        # Print Debug Info ###############################################
-        if verbose > 1:                                                  #
-            print("        v" + " "*len(pat) + "v" + " "*len(rep) + "v") #
-            print("APPLY:  /" + pat + "/" + rep + "/" + string + "\n")   #
-            if verbose > 3:                                              #
-                _ = input("\nPress <Return> to resume execution")        #
-                print("\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A")             #
-        ##################################################################
+        # Print Debug Info ##########################################
+        if verbose > 1:                                             #
+            print("APPLY:  "+X[0]+pat+X[1]+rep+X[2]+string+X[3])    #
+            if verbose > 3:                                         #
+                _ = input("\nPress <Return> to resume execution")   #
+                print("\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A")        #
+        #############################################################
 
         while pat in string:
             string = string.replace(pat, rep, 1)
 
-            # Print Debug Info ###############################################
-            if verbose > 2:                                                  #
-                print("        v" + " "*len(pat) + "v" + " "*len(rep) + "v") #
-                print("APPLY:  /" + pat + "/" + rep + "/" + string + "\n")   #
-                if verbose > 4:                                              #
-                    _ = input("\nPress <Return> to resume execution")        #
-                    print("\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A")             #
-            ##################################################################
+            # Print Debug Info ##########################################
+            if verbose > 2:                                             #
+                print("APPLY:  "+X[0]+pat+X[1]+rep+X[2]+string+X[3])    #
+                if verbose > 4:                                         #
+                    _ = input("\nPress <Return> to resume execution")   #
+                    print("\x1b[1A\x1b[2K\x1b[1A\x1b[2K\x1b[1A")        #
+            #############################################################
 
-    # Print Debug Info ####################################
-    if verbose > 0: print("\nOUTPUT: " + "".join(output)) #
-    #######################################################
+    # Print Debug Info ##################################
+    if verbose > 0: print("OUTPUT: " + "".join(output)) #
+    #####################################################
+
+################################################################################
+
+
+
+### COMPACT /// INTERPRETER ####################################################
+
+def S(s):
+  while s:
+    b = ["","",1]
+    for t in (0,1,2):
+      while s:
+        if s[0] == "/" :      s = s[1:]; break
+        if s[0] == "\\":      s = s[1:]
+        if t: b[t-1] += s[0]; s = s[1:]
+        else: yield     s[0]; s = s[1:]
+    while s and b[0] in s: s = s.replace(*b)
 
 ################################################################################
 
@@ -263,49 +288,222 @@ if __name__ == "__main__":
     HELLO_WORLD_4 = "/-/World//--/Hello//--W/--, w/---!"
     HELLO_WORLD_5 = r"/foo/Hello, world!//B\/\\R/foo/B/\R"
     HELLO_WORLD_6 = "/foo/Hello, world!//B\\/\\\\R/foo/B/\\R"
-    BINARY_TO_UNARY = "/1/0*//*0/0**//0//100010"
-    THUE_MORSE = r"/*/\/.\\0\/,\\,0,\\,1\/\/.\\1\/,\\,1,\\,0\/\/,\\,\/.\//****/.//.0"
-    FIBONACCI = r"/!/\/.\\0\/,\\,0,\\,1\/\/.\\1\/,\\,0\/\/,\\,\/.\/\/+\\+\/=\\=.\\1-\/\/=\\=\/+\\+\//!!!!!!!!!/.///+\+///-/\\\///0/1//1/*/++.1"
+
+    THUE_MORSE = r"""/
+        //
+        /*/#</
+        /<#/#/
+        /</\/.\/\/.0/
+        /#/\/.\\0\/,\\,0,\\,1\/\/.\\1\/,\\,1,\\,0\/\/,\\,\/.\//
+        """
+
+    FIBONACCI = r"""/
+        //
+        /**/##/
+        /#*/##/
+        /#/@</
+        /<@/@/
+        /</\/.\/\/\/+\\+\/\/\/-\/\\\\\\\/\/\/0\/1\/\/1\/*\/++.1/
+        /@/\/.\\0\/,\\,0,\\,1\/\/.\\1\/,\\,0\/\/,\\,\/.\/\/+\\+\/=\\=.\\1-\/\/=\\=\/+\\+\//
+        """
+
+    UNARY_TO_ROMAN = r"""/
+        //
+        /*/I/
+        /IIIII/V/
+        /IIII/IV/
+        /VV/X/
+        /VIV/IX/
+        /XXXXX/L/
+        /XXXX/XL/
+        /LL/C/
+        /LXL/XC/
+        /CCCCC/D/
+        /CCCC/CD/
+        /DD/M/
+        /DCD/CM/
+        """
+
+    ROMAN_TO_UNARY = r"""/
+        //
+        /CM/DCD/
+        /M/DD/
+        /CD/CCCC/
+        /D/CCCCC/
+        /XC/LXL/
+        /C/LL/
+        /XL/XXXX/
+        /L/XXXXX/
+        /IX/VIV/
+        /X/VV/
+        /IV/IIII/
+        /V/IIIII/
+        /I/*/
+        """
+
+    DECIMAL_TO_UNARY = r"""/
+        //
+        /9/8*/
+        /8/7*/
+        /7/6*/
+        /6/5*/
+        /5/4*/
+        /4/3*/
+        /3/2*/
+        /2/1*/
+        /1/0*/
+        /*0/9*/
+        /0//
+        """
+
+    UNARY_TO_DECIMAL = r"""/
+        //
+        /*/>01/
+        /1>/1/
+        /10/01/
+        /01111111111/1\0/
+        /0111111111/_9/
+        /011111111/_8/
+        /01111111/_7/
+        /0111111/_6/
+        /011111/_5/
+        /01111/_4/
+        /0111/_3/
+        /011/_2/
+        /01/_1/
+        /_//
+        />0/>/
+        />//
+        """
+
+    BINARY_TO_UNARY = r"""/
+        //
+        /1/0*/
+        /*0/0**/
+        /0//
+        """
+    
+    UNARY_TO_BINARY = r"""/
+        //
+        /*/>01/
+        /1>/1/
+        /10/01/
+        /011/1\0/
+        /01/_1/
+        /_//
+        />0/>/
+        />//
+        """
+
+    BINARY_SUMS = r"""/
+        //
+        / //
+        /++/+/
+        /-+/+/
+        /+-/-/
+        /--/-/
+        /11/0*0*/
+        /10/0*0/
+        /01/00*/
+        /*0/0**/
+        /0*/*/
+        /+0//
+        /-0//
+        /+1/+*/
+        /-1/-*/
+        /-*/#-/
+        /#-/#/
+        /+//
+        /1#//
+        /1*/**/
+        /0#/#/
+        /0\*/*/
+        /*#//
+        /#*//
+        /#/-OI/
+        /I-/I/
+        /*/>OI/
+        /I>/I/
+        /IO/OI/
+        /OII/I\O/
+        /OI/_I/
+        /_//
+        /-O/-/
+        />O/>/
+        />//
+        /I/1/
+        /O/0/
+        """
 
     # Run them all:
 
-    _ = "".join(slashes(HELLO_WORLD_0, verbose=3))
+    _ = "".join(slashes(HELLO_WORLD_0, verbose=3, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(HELLO_WORLD_1, verbose=3))
+    _ = "".join(slashes(HELLO_WORLD_1, verbose=3, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(HELLO_WORLD_2, verbose=3))
+    _ = "".join(slashes(HELLO_WORLD_2, verbose=3, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(HELLO_WORLD_3, verbose=3))
+    _ = "".join(slashes(HELLO_WORLD_3, verbose=3, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(HELLO_WORLD_4, verbose=3))
+    _ = "".join(slashes(HELLO_WORLD_4, verbose=3, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(HELLO_WORLD_5, verbose=3))
+    _ = "".join(slashes(HELLO_WORLD_5, verbose=3, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(HELLO_WORLD_6, verbose=3))
+    _ = "".join(slashes(HELLO_WORLD_6, verbose=3, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(THUE_MORSE, verbose=1))
+    _ = "".join(slashes(THUE_MORSE+"*****", verbose=1, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(FIBONACCI, verbose=1))
+    _ = "".join(slashes(FIBONACCI+"*********", verbose=1, color=2))
 
     print("\n--------------------------------------------------------------\n")
 
-    _ = "".join(slashes(BINARY_TO_UNARY, verbose=5))
+    _ = "".join(slashes(DECIMAL_TO_UNARY+"34", verbose=3, color=2))
+
+    print("\n--------------------------------------------------------------\n")
+
+    _ = "".join(slashes(UNARY_TO_DECIMAL+"**********************************",
+                        verbose=1, color=2))
+
+    print("\n--------------------------------------------------------------\n")
+
+    _ = "".join(slashes(BINARY_TO_UNARY+"100010", verbose=3, color=2))
+
+    print("\n--------------------------------------------------------------\n")
+
+    _ = "".join(slashes(UNARY_TO_BINARY+"**********************************",
+                        verbose=1, color=2))
+
+    print("\n--------------------------------------------------------------\n")
+
+    _ = "".join(slashes(ROMAN_TO_UNARY+"XXXIV", verbose=1, color=2))
+
+    print("\n--------------------------------------------------------------\n")
+
+    _ = "".join(slashes(UNARY_TO_ROMAN+"**********************************",
+                        verbose=1, color=2))
+
+    print("\n--------------------------------------------------------------\n")
+
+    _ = "".join(slashes(BINARY_SUMS+" 1-1+0-10000+101++1+0-1---0 +  10 11- 1 0",
+                        verbose=1, color=2))
+
+    print("\n--------------------------------------------------------------\n")
 
 
 ################################################################################
